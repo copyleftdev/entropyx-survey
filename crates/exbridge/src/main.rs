@@ -46,13 +46,14 @@ struct AppState {
 
 #[tokio::main]
 async fn main() {
+    // Default to wherever the server was started. Run it inside a
+    // repository and that repository is offered; run it in a directory of
+    // repositories and they are all listed. Nothing is assumed about how
+    // anyone lays out their disk.
     let repo_root = std::env::var("EXBRIDGE_REPO_ROOT")
         .map(PathBuf::from)
-        .unwrap_or_else(|_| {
-            std::env::var("HOME")
-                .map(|h| PathBuf::from(h).join("Project"))
-                .unwrap_or_else(|_| PathBuf::from("."))
-        });
+        .unwrap_or_else(|_| PathBuf::from("."));
+    let repo_root = std::fs::canonicalize(&repo_root).unwrap_or(repo_root);
     let port: u16 = std::env::var("EXBRIDGE_PORT")
         .ok()
         .and_then(|p| p.parse().ok())
@@ -119,24 +120,31 @@ async fn list_repos(
     Query(q): Query<ReposQuery>,
 ) -> Json<serde_json::Value> {
     let root = q.root.map(PathBuf::from).unwrap_or(st.repo_root.clone());
+    let root = std::fs::canonicalize(&root).unwrap_or(root);
     let mut out: Vec<serde_json::Value> = Vec::new();
+
+    let entry = |p: &Path| {
+        serde_json::json!({
+            "name": p.file_name().map(|s| s.to_string_lossy().to_string()).unwrap_or_default(),
+            "path": p.to_string_lossy(),
+        })
+    };
+
+    // The root may itself be a repository — the common case when the
+    // server is started from inside one.
+    if root.join(".git").exists() {
+        out.push(entry(&root));
+    }
     if let Ok(entries) = std::fs::read_dir(&root) {
         for e in entries.flatten() {
             let p = e.path();
-            if !p.join(".git").exists() {
-                continue;
+            if p.join(".git").exists() {
+                out.push(entry(&p));
             }
-            let name = p
-                .file_name()
-                .map(|s| s.to_string_lossy().to_string())
-                .unwrap_or_default();
-            out.push(serde_json::json!({
-                "name": name,
-                "path": p.to_string_lossy(),
-            }));
         }
     }
     out.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
+    out.dedup_by(|a, b| a["path"] == b["path"]);
     Json(serde_json::json!({ "root": root.to_string_lossy(), "repos": out }))
 }
 

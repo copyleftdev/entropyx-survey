@@ -130,10 +130,11 @@ async function loadRepoList() {
       o.label = repo.name;
       list.appendChild(o);
     }
-    if (j.repos?.length) {
-      $('sheet-sub').textContent =
-        `${j.repos.length} repositories found under ${j.root}. Pick one, or type any path.`;
-    }
+    $('sheet-sub').textContent = j.repos?.length
+      ? `${j.repos.length} ${j.repos.length === 1 ? 'repository' : 'repositories'} found under ${j.root}. `
+        + 'Pick one, or type the path to any git repository on this machine.'
+      : `No git repositories under ${j.root}. Type the path to any repository on this machine, `
+        + 'or restart with EXBRIDGE_REPO_ROOT pointing at where you keep them.';
   } catch {
     $('sheet-sub').textContent = 'Bridge unreachable. Start exbridge, then reload.';
   }

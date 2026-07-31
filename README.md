@@ -48,8 +48,13 @@ EXBRIDGE_REPO_ROOT=$HOME/Project ./target/release/exbridge
 | env | default | meaning |
 |---|---|---|
 | `EXBRIDGE_PORT` | `7878` | listen port (loopback only) |
-| `EXBRIDGE_REPO_ROOT` | `$HOME/Project` | directory scanned one level deep for repos |
+| `EXBRIDGE_REPO_ROOT` | current directory | where to look for repositories |
 | `EXBRIDGE_WEB_DIR` | `web` | static root |
+
+`EXBRIDGE_REPO_ROOT` is only a convenience for populating the picker: the root
+itself counts if it is a repository, and so does anything one level below it.
+You can always type the path to any git repository on the machine instead —
+nothing is restricted to that root.
 
 `entropyx` and `wtd` must be on `PATH`. `kraken` is optional; without it (or without a
 GitHub token) the identity layer reports why it is absent and everything else works.
@@ -68,9 +73,14 @@ keeping output byte-identical. Medians of 5 runs on an idle box:
 | repo | `entropyx scan` | bridge | speedup |
 |---|--:|--:|--:|
 | CodexBar (1,925 commits) | 10.31 s | 1.33 s | 7.1–8.5× |
-| anomalyx | 33.66 s | 0.78 s | 39.0–47.8× |
-| api-core (2,704 files) | 55.53 s | 2.90 s | 14.9–22.9× |
-| **TrendRadar** | **755 s** | **28.60 s** | **~26×** |
+| repo C (72 commits, dense graph) | 33.66 s | 0.78 s | 39.0–47.8× |
+| repo D (2,704 files) | 55.53 s | 2.90 s | 14.9–22.9× |
+| **TrendRadar** (2,076 commits) | **755 s** | **28.60 s** | **~26×** |
+
+CodexBar and TrendRadar are public — `github.com/steipete/CodexBar` and
+`github.com/sansan0/TrendRadar` — so those two rows are reproducible. The
+lettered repositories are private and appear only as their shape;
+`docs/PERF.md` lists the dimensions that explain each timing.
 
 Byte-for-byte identical output, including against the original 755-second run.
 Ranges are 95% intervals via `agent-calc`; see *Keeping it bit-identical* in
@@ -117,7 +127,7 @@ EXBRIDGE_PARITY_REPO=/path/to/repo cargo test --release -p exbridge --test parit
 ```
 
 The guarantee is stronger than the test — output is **byte-for-byte identical**
-to `entropyx scan`, verified on agent-calc, aion-fs, anomalyx, and CodexBar:
+to `entropyx scan`, verified byte-for-byte on all six subjects:
 
 ```sh
 entropyx scan REPO --no-cache > a.json
@@ -215,7 +225,7 @@ they commit with. Measured:
 | repo | resolved / authors | share of commits |
 |---|--:|--:|
 | CodexBar (public, 101 authors) | **1 / 101** | **68%** |
-| api-core (company, 16 authors) | **10 / 16** | **93%** |
+| repo D (private, 16 authors) | **10 / 16** | **93%** |
 
 One percent by headcount and 68% by contribution are the same fact seen two ways; the UI
 always states both. Addresses that can never resolve — GitHub noreply relays and bot

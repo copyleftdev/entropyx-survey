@@ -2,6 +2,23 @@
 
 Measured 2026-07-30/31 against entropyx 0.1.0 on a 64-core Linux box.
 
+**The subjects.** Two are public repositories anyone can clone and reproduce
+these numbers against. The other four are private, and appear only as their
+measurable shape — which is what actually explains the timings, since scan cost
+is driven by graph density and file count, not by what a repository is called.
+
+| subject | commits | files at HEAD | lifetime paths | mean degree | clone |
+|---|--:|--:|--:|--:|---|
+| repo A | 49 | 96 | 100 | 33 | private |
+| CodexBar | 1 925 | 780 | 925 | 199 | `github.com/steipete/CodexBar` |
+| repo D | 248 | 2 704 | 2 576 | 382 | private |
+| repo C | 72 | 119 | 1 995 | 577 | private |
+| repo B | 39 | 956 | 961 | 825 | private |
+| TrendRadar | 2 076 | 397 | 4 270 | 3 531 | `github.com/sansan0/TrendRadar` |
+
+"Mean degree" is the co-change graph's average neighbours per node. It is the
+single best predictor of scan cost, and the tables below are ordered by it.
+
 This document exists because the intuitive model — "big repository, long scan" —
 is wrong, and building a UI on it would have produced a progress bar that lies.
 
@@ -24,11 +41,11 @@ Seconds per phase, full history, phases under 0.05 s omitted:
 
 | repo | commit_loop | betweenness | blame | total | leader |
 |---|--:|--:|--:|--:|---|
-| agent-calc | 0.34 | ~0 | **1.51** | 2.0 | blame 76% |
+| repo A | 0.34 | ~0 | **1.51** | 2.0 | blame 76% |
 | CodexBar | 1.30 | 0.68 | **7.00** | 9.2 | blame 76% |
-| aion-fs | 0.19 | 3.22 | **4.18** | 7.2 | blame 58% |
-| anomalyx | 0.25 | **17.26** | 1.49 | 17.7 | betweenness 92% |
-| api-core | 1.13 | **17.83** | 12.72 | 32.2 | betweenness 55% |
+| repo B | 0.19 | 3.22 | **4.18** | 7.2 | blame 58% |
+| repo C | 0.25 | **17.26** | 1.49 | 17.7 | betweenness 92% |
+| repo D | 1.13 | **17.83** | 12.72 | 32.2 | betweenness 55% |
 | TrendRadar | — | **dominant** | — | 755 | betweenness ~99% |
 
 Together those two are 85–99% of every scan measured. Everything the tool is
@@ -44,14 +61,14 @@ margin.
 
 | repo | commits | HEAD files | V (lifetime paths) | E (Σ C(k,2)) | cold scan |
 |---|--:|--:|--:|--:|--:|
-| agent-calc | 49 | 96 | 100 | 1 860 | **2.0 s** |
-| aion-fs | 39 | 956 | 961 | 396 838 | 7.2 s |
+| repo A | 49 | 96 | 100 | 1 860 | **2.0 s** |
+| repo B | 39 | 956 | 961 | 396 838 | 7.2 s |
 | CodexBar | **1 925** | 780 | 925 | 70 083 | **9.2 s** |
-| anomalyx | **72** | 119 | 1 995 | 837 236 | **17.7 s** |
-| api-core | 248 | 2 704 | 2 576 | 1 053 551 | 32.2 s |
+| repo C | **72** | 119 | 1 995 | 837 236 | **17.7 s** |
+| repo D | 248 | 2 704 | 2 576 | 1 053 551 | 32.2 s |
 | TrendRadar | 2 076 | 397 | 4 270 | 7 546 312 | **755 s** |
 
-CodexBar has **27× anomalyx's commits and scans 2× faster.**
+CodexBar has **27× repo C's commits and scans 2× faster.**
 
 Two independent quantities predict runtime instead:
 
@@ -61,14 +78,14 @@ T ≈ V·E / 10⁸  +  0.005…0.015 × HEAD_files
 ```
 
 **V** is distinct file paths over the repository's *lifetime*, not at HEAD —
-anomalyx has 119 files at HEAD but 1 995 paths across its history, because
+repo C has 119 files at HEAD but 1 995 paths across its history, because
 deleted and renamed-away files stay in the graph. **E** is Σ over commits of
 C(files_in_commit, 2): every commit contributes a clique over the paths it
 touched, so a commit touching *k* files adds k²/2 edges. TrendRadar contains a
 single 3 868-file commit, which alone contributes ~7.5M edges.
 
-Predicted vs measured betweenness: aion-fs 3.8 s / 3.22 s, anomalyx 17 s /
-17.26 s, CodexBar 0.65 s / 0.68 s, api-core 27 s / 17.83 s. Good to roughly
+Predicted vs measured betweenness: repo B 3.8 s / 3.22 s, repo C 17 s /
+17.26 s, CodexBar 0.65 s / 0.68 s, repo D 27 s / 17.83 s. Good to roughly
 ±40%, which is enough to know which phase will lead.
 
 ## Three things that do not help
@@ -76,14 +93,14 @@ Predicted vs measured betweenness: aion-fs 3.8 s / 3.22 s, anomalyx 17 s /
 Each of these was tested, not assumed.
 
 **`--since N` is a performance no-op.** It bounds the commit walk only; the
-co-change graph and the blame loop are untouched. On anomalyx, `--since 1`
+co-change graph and the blame loop are untouched. On repo C, `--since 1`
 (one commit, four changed files) took 20.4 s against 22.5 s for full history.
 
 **The disk cache buys nothing measurable.** It caches parsed AST items, which
-live in the small commit-loop phase. Populate-then-rerun on anomalyx: 22.2 s
+live in the small commit-loop phase. Populate-then-rerun on repo C: 22.2 s
 then 22.7 s.
 
-**`git gc` changes nothing.** anomalyx ships 3 033 loose objects and issues
+**`git gc` changes nothing.** repo C ships 3 033 loose objects and issues
 ~92 000 `openat` calls during a scan, which looks like the culprit until you
 measure it: syscall time totals 0.48 s against 21 s of *user* CPU. Repacking a
 clone into 2 packfiles: 21.8 s, statistically identical.
@@ -118,7 +135,7 @@ it looked.
 | interaction | before | after |
 |---|--:|--:|
 | click a cell → commits appear (CodexBar, 1,925 commits) | **1,210 ms** | **12 ms** |
-| same, api-core (248 commits) | 470 ms | 1.8 ms |
+| same, repo D (248 commits) | 470 ms | 1.8 ms |
 | re-score all files on a weight change (925 files) | — | 2.2–4.1 ms |
 | selection lookup | O(cells) | O(1) |
 | handle → path lookup | O(handles), per selection | O(1) |
@@ -174,11 +191,11 @@ reverse). Every pair differs at p < 0.01 by Welch's `two_sample_t`.
 
 | repo | mean degree | `entropyx scan` | bridge | speedup |
 |---|--:|--:|--:|--:|
-| agent-calc | 33 | 1.98 s | 0.56 s | 3.4–3.7× |
+| repo A | 33 | 1.98 s | 0.56 s | 3.4–3.7× |
 | CodexBar | 199 | 10.31 s | 1.33 s | 7.1–8.5× |
-| api-core | 382 | 55.53 s | 2.90 s | 14.9–22.9× |
-| anomalyx | 577 | 33.66 s | 0.78 s | 39.0–47.8× |
-| aion-fs | 825 | 8.87 s | 0.77 s | 9.0–14.4× |
+| repo D | 382 | 55.53 s | 2.90 s | 14.9–22.9× |
+| repo C | 577 | 33.66 s | 0.78 s | 39.0–47.8× |
+| repo B | 825 | 8.87 s | 0.77 s | 9.0–14.4× |
 | **TrendRadar** | **3531** | **755 s** | **28.60 s** | **~26×** |
 
 Output is **byte-for-byte identical** on all six, TrendRadar included — checked
@@ -238,11 +255,11 @@ It is also a trap. Measured across all three variants:
 
 | repo | mean degree | fresh preds | adjacency scan | retained preds |
 |---|--:|--:|--:|--:|
-| agent-calc | 33 | 0.72 s | 0.72 s | 0.78 s |
+| repo A | 33 | 0.72 s | 0.72 s | 0.78 s |
 | CodexBar | 199 | 2.45 s | 2.35 s | 2.39 s |
-| api-core | 382 | 4.76 s | 3.49 s | 3.67 s |
-| anomalyx | 577 | 1.32 s | 0.91 s | 1.00 s |
-| aion-fs | 825 | 0.87 s | 0.90 s | 0.88 s |
+| repo D | 382 | 4.76 s | 3.49 s | 3.67 s |
+| repo C | 577 | 1.32 s | 0.91 s | 1.00 s |
+| repo B | 825 | 0.87 s | 0.90 s | 0.88 s |
 | TrendRadar | 3531 | ~28 s | **55.40 s** | **27.06 s** |
 
 The scan doubles the worst case. A dense graph has a shallow BFS: on TrendRadar
@@ -272,7 +289,7 @@ deduplicated pass.
 | repo | commit_loop before | after | |
 |---|--:|--:|--:|
 | CodexBar | 1.40 s | 0.56 s | 2.5× |
-| api-core | 1.02 s | 0.27 s | 3.8× |
+| repo D | 1.02 s | 0.27 s | 3.8× |
 | TrendRadar | 2.66 s | 0.33 s | 8.1× |
 
 ### Where the time goes now
@@ -282,14 +299,14 @@ Seconds per phase, measured through the bridge:
 | repo | commit_loop | graph_build | betweenness | blame | total |
 |---|--:|--:|--:|--:|--:|
 | CodexBar | 0.56 | — | 0.05 | **0.93** | 2.13 |
-| api-core | 0.27 | 0.19 | 0.77 | **1.91** | 3.71 |
+| repo D | 0.27 | 0.19 | 0.77 | **1.91** | 3.71 |
 | TrendRadar | 0.33 | 1.90 | **26.45** | 0.22 | 29.75 |
 
 Two bottlenecks remain, and they are different problems:
 
 - **Blame**, on repositories with many files at HEAD. It is already parallel, so
   what is left is process-spawn cost — one `git blame` per file, 2,213 of them on
-  api-core. Only `gix-blame` landing in-process would remove it.
+  repo D. Only `gix-blame` landing in-process would remove it.
 - **Betweenness**, on dense graphs. At mean degree 3,531 TrendRadar spends 89% of
   its scan there even fully parallel; the algorithm is O(V·E) and no amount of
   cores changes that. Sampling sources would, at the cost of exactness — which
