@@ -6,14 +6,16 @@
 A streaming bridge and browser survey for [entropyx](https://github.com/copyleftdev/entropyx),
 plus its scoring kernel compiled to WebAssembly.
 
-![The survey sheet: a squarified treemap of a repository where cell area is change
-density and shade is the blended risk score, with a legend, a per-file measurement
-profile and the commits behind it](docs/survey.png)
+![A walkthrough: typing a repository path and starting a survey, the phase log
+filling with real timings, the terrain drawing in, selecting a file to read its
+seven measurements and commits, dragging a weight slider while the map re-tints
+live, and hovering a survey mark to see what it records](docs/demo.gif)
 
-*entropyx surveying its own source. Cell **area** is how much a file changes,
-**shade** is its overall score, and the symbols mark the six patterns entropyx
-recognises. The right rail reads one file: its seven measurements and the commits
-behind them.*
+*A real run against entropyx's own source, unedited apart from a faster opening.
+Watch for: the phase log showing where the time actually went; the map drawing in;
+one file's seven measurements and the commits behind them; the score moving
+0.35 → 0.66 → 0.34 as a weight slider is dragged, re-scored in the browser by
+entropyx's own code; and a survey mark reporting the rename it recorded.*
 
 ```
   entropyx crates ──┐                          ┌──► index.html  the survey sheet
@@ -298,6 +300,9 @@ team using conventional-commit prefixes registers more than one that does not.
 The interface treats the repository as terrain. Cell **area** is change density
 D<sub>n</sub>; cell **elevation** is the composite, tinted in hypsometric bands
 like a topographic quadrangle. Signal classes are drawn as cartographic symbols.
+
+![The survey sheet at full resolution: the treemap, the elevation ramp and pattern
+legend, and the right rail reading one file's measurements and commits](docs/survey.png)
 
 Two things worth knowing about how it reads:
 
