@@ -1,0 +1,23 @@
+[package]
+name = "exbridge"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "SSE bridge that streams entropyx scan phases and tq1 summaries to the browser."
+
+[dependencies]
+entropyx-core = { workspace = true }
+entropyx-git = { workspace = true }
+entropyx-ast = { workspace = true }
+entropyx-graph = { workspace = true }
+entropyx-tq = { workspace = true }
+entropyx-cli = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+axum = "0.8"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "signal", "time", "process"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+tower-http = { version = "0.6", features = ["fs", "cors"] }
+rayon = "1.10"
+blake3 = "1"

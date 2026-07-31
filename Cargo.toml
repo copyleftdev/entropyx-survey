@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+members = ["crates/exbridge", "crates/exkernel"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "AGPL-3.0-or-later"
+
+[workspace.dependencies]
+entropyx-core = { path = "../entropyx/crates/entropyx-core" }
+entropyx-git = { path = "../entropyx/crates/entropyx-git" }
+entropyx-ast = { path = "../entropyx/crates/entropyx-ast" }
+entropyx-graph = { path = "../entropyx/crates/entropyx-graph" }
+entropyx-tq = { path = "../entropyx/crates/entropyx-tq" }
+entropyx-cli = { path = "../entropyx/crates/entropyx-cli" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>entropyx survey</title>
+<meta name="description" content="A cartographic survey of a git repository. Every file placed on a terrain of risk, measured by entropyx.">
+<meta name="theme-color" content="#f7f3ea">
+<link rel="stylesheet" href="./fonts/fonts.css">
+<link rel="stylesheet" href="./style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23f7f3ea'/><path d='M1 12 L5 5 L8 9 L11 3 L15 11' fill='none' stroke='%238a4a22' stroke-width='1.5'/></svg>">
+</head>
+<body>
+
+<!-- Cartographic symbol sprite. Map symbols are drawn in ink at text
+     scale — they mark things on a sheet, they are not app icons. -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="sym-incident_aftershock" viewBox="0 0 16 16">
+      <path d="M1 11 L4 5 L6.5 9.5 L9 3 L11.5 8 L15 5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="miter"/>
+    </symbol>
+    <symbol id="sym-coupled_amplifier" viewBox="0 0 16 16">
+      <path d="M2 2 L8 8 M14 2 L8 8 M8 8 L8 14" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="8" cy="8" r="2.1" fill="currentColor"/>
+    </symbol>
+    <symbol id="sym-api_drift" viewBox="0 0 16 16">
+      <path d="M1 5.5 H15" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M1 10.5 H15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 2.5"/>
+      <path d="M11 13 L14 10.5 L11 8" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    </symbol>
+    <symbol id="sym-refactor_convergence" viewBox="0 0 16 16">
+      <path d="M2 14 Q8 8 14 14" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M4 14 Q8 10 12 14" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M6 14 Q8 12 10 14" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="8" cy="4" r="1.6" fill="currentColor"/>
+    </symbol>
+    <symbol id="sym-ownership_fragmentation" viewBox="0 0 16 16">
+      <circle cx="3" cy="4" r="1.5" fill="currentColor"/>
+      <circle cx="9" cy="2.5" r="1.5" fill="currentColor"/>
+      <circle cx="13.5" cy="6" r="1.5" fill="currentColor"/>
+      <circle cx="5" cy="10" r="1.5" fill="currentColor"/>
+      <circle cx="11" cy="12.5" r="1.5" fill="currentColor"/>
+      <circle cx="2.5" cy="14" r="1.5" fill="currentColor"/>
+    </symbol>
+    <symbol id="sym-frozen_neglect" viewBox="0 0 16 16">
+      <path d="M8 1 V15 M2 4.5 L14 11.5 M14 4.5 L2 11.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M5.6 2.6 L8 4.4 L10.4 2.6" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    </symbol>
+    <!-- Triangulation station: marks the selected point on the sheet. -->
+    <symbol id="sym-station" viewBox="0 0 16 16">
+      <path d="M8 2 L14.5 13.5 H1.5 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="8" cy="10" r="1.7" fill="currentColor"/>
+    </symbol>
+    <symbol id="sym-rename" viewBox="0 0 16 16">
+      <path d="M2 8 H12" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M9 4.5 L13 8 L9 11.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    </symbol>
+    <symbol id="sym-hotspot" viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="2" fill="currentColor"/>
+      <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+      <circle cx="8" cy="8" r="7.2" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/>
+    </symbol>
+    <symbol id="sym-ownership_split" viewBox="0 0 16 16">
+      <path d="M2 13 L8 3 L14 13" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M8 3 V13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2 2"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="sheet">
+  <div class="sheet__id">
+    <span class="sheet__series">ENTROPYX SURVEY</span>
+    <h1 class="sheet__title" id="sheet-title">No sheet loaded</h1>
+    <p class="sheet__sub" id="sheet-sub">Choose a repository to survey.</p>
+  </div>
+
+  <form class="control" id="scan-form">
+    <label class="control__label" for="repo">Repository</label>
+    <div class="control__row">
+      <input class="control__input" id="repo" name="repo" list="repo-list" spellcheck="false"
+             placeholder="/path/to/repo" autocomplete="off" required>
+      <datalist id="repo-list"></datalist>
+      <button class="btn btn--primary" type="submit" id="survey-btn">Survey</button>
+      <button class="btn" type="button" id="abort-btn" hidden>Abort</button>
+    </div>
+    <p class="control__aside">
+      <a class="btn btn--ghost" id="to-brief" href="./brief.html">Read the plain-language brief instead</a>
+    </p>
+    <div class="control__opts">
+      <label class="opt"><input type="checkbox" id="fresh"> Re-run even if cached</label>
+      <label class="opt">Last
+        <input class="opt__num" type="number" id="since" min="1" placeholder="all" inputmode="numeric">
+        commits</label>
+    </div>
+  </form>
+
+  <dl class="marginalia" id="marginalia" hidden>
+    <div><dt>HEAD</dt><dd id="m-head" class="num">—</dd></div>
+    <div><dt>Files</dt><dd id="m-files" class="num">—</dd></div>
+    <div><dt>Events</dt><dd id="m-events" class="num">—</dd></div>
+    <div><dt>Authors</dt><dd id="m-authors" class="num">—</dd></div>
+    <div><dt>Survey time</dt><dd id="m-time" class="num">—</dd></div>
+    <div><dt>Digest</dt><dd id="m-digest" class="num" title="blake3 of the tq1 summary — identical inputs always produce this same value">—</dd></div>
+  </dl>
+</header>
+
+<main class="sheet-body">
+  <!-- Coordinate gutter: registration ticks down the left margin, as on a
+       printed quadrangle. Decorative, but it is the sheet's frame. -->
+  <div class="gutter" aria-hidden="true"><div class="gutter__ticks" id="gutter-ticks"></div></div>
+
+  <div class="field">
+
+    <!-- First run teaches the sheet's language before there is any data
+         on it: what the two visual channels encode, and what the wait
+         will cost. -->
+    <section class="blank" id="blank">
+      <h2 class="section-title">This sheet is blank</h2>
+      <p class="blank__lede">
+        entropyx measures seven things about every file, straight from the git history.
+        This map shows two of them at once.
+      </p>
+      <ol class="blank__keys">
+        <li>
+          <span class="blank__keynum num">01</span>
+          <div>
+            <h3>Bigger means busier</h3>
+            <p>A file's size on the map is how much change it takes on. The busiest files are the biggest.</p>
+          </div>
+        </li>
+        <li>
+          <span class="blank__keynum num">02</span>
+          <div>
+            <h3>Darker means hotter</h3>
+            <p>All seven measurements blended into one score, shaded in bands like a contour map.</p>
+          </div>
+        </li>
+        <li>
+          <span class="blank__keynum num">03</span>
+          <div>
+            <h3>Symbols mark patterns</h3>
+            <p>Six shapes entropyx knows how to spot. Each describes something that already happened — none is a prediction.</p>
+          </div>
+        </li>
+      </ol>
+      <p class="blank__cost">
+        <strong>Most surveys finish in a second or two</strong>, and repository age is not what
+        decides it — how tangled the files are is. The largest repository measured here takes
+        27 seconds; a repository with eight times fewer commits takes one. The log shows where
+        the time actually went.
+      </p>
+    </section>
+
+    <section class="log" id="log" aria-live="polite" hidden>
+      <div class="log__head">
+        <h2 class="section-title">Survey log</h2>
+        <button class="btn btn--ghost" type="button" id="log-toggle" aria-expanded="true" aria-controls="log-list">Collapse</button>
+      </div>
+      <p class="log__note" id="log-note">Idle.</p>
+      <ol class="log__list" id="log-list"></ol>
+    </section>
+
+    <section class="terrain-wrap" id="terrain-wrap" hidden>
+      <div class="terrain__head">
+        <h2 class="section-title">Terrain</h2>
+        <p class="terrain__legendnote">
+          <strong>Size</strong> is how much a file changes. <strong>Shade</strong> is its overall
+          score. Both are measured, not estimated.
+        </p>
+      </div>
+
+      <div class="terrain" id="terrain" role="list" tabindex="0"
+           aria-label="Repository terrain. Each cell is a file; use arrow keys to move between cells."></div>
+
+      <p class="terrain__truncation" id="truncation" hidden></p>
+
+      <div class="legend">
+        <div class="legend__ramp">
+          <span class="legend__title">Overall score</span>
+          <div class="ramp" id="ramp"></div>
+          <div class="ramp__scale" id="ramp-scale"><span>0.0</span><span>0.5</span><span>1.0</span></div>
+          <p class="ramp__note" id="ramp-note"></p>
+        </div>
+        <div class="legend__classes">
+          <span class="legend__title">Patterns</span>
+          <ul class="classlist" id="classlist"></ul>
+          <p class="classlist__note" id="class-note"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="calib" id="calib" hidden>
+      <div class="calib__head">
+        <h2 class="section-title">Calibration</h2>
+        <p class="calib__note">
+          Decide what should count, and the map redraws as you drag. The scoring runs here in your
+          browser using entropyx's own code, so these numbers still match a real scan.
+          <span class="calib__kernel" id="kernel-note"></span>
+        </p>
+      </div>
+      <div class="calib__grid" id="weights"></div>
+      <div class="calib__foot">
+        <p class="calib__sum" id="wsum"></p>
+        <button class="btn btn--ghost" type="button" id="reset-weights">Reset to defaults</button>
+      </div>
+    </section>
+
+    <!-- Divergence: WhatTheDiff's view of the same repository. entropyx
+         says which files churn; wtd says which disagree with their peers.
+         They join on path. -->
+    <section class="diverge" id="diverge" hidden>
+      <div class="diverge__head">
+        <h2 class="section-title">Divergence</h2>
+        <p class="diverge__note" id="diverge-note"></p>
+      </div>
+      <div id="diverge-body"></div>
+      <details class="diverge__excluded" id="diverge-excluded" hidden>
+        <summary>Groups we skipped, and why</summary>
+        <ul id="diverge-excluded-list"></ul>
+      </details>
+    </section>
+
+    <!-- Contributor identities from kraken. Optional: repositories with
+         no GitHub origin simply do not get this layer. -->
+    <section class="people" id="people" hidden>
+      <div class="people__head">
+        <h2 class="section-title">Contributors</h2>
+        <p class="people__note" id="people-note"></p>
+      </div>
+      <ul class="roster" id="roster"></ul>
+    </section>
+
+    <section class="marks" id="marks" hidden>
+      <div class="marks__head">
+        <h2 class="section-title">Survey marks</h2>
+        <p class="marks__note" id="marks-note"></p>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+  </div>
+
+  <aside class="rail" id="rail">
+    <div class="rail__empty" id="rail-empty">
+      <svg class="rail__emptyicon" aria-hidden="true"><use href="#sym-station"/></svg>
+      <p><strong>Nothing selected yet.</strong></p>
+      <p>Pick any cell on the map to see what was measured and the commits behind it.</p>
+    </div>
+
+    <div class="rail__body" id="rail-body" hidden>
+      <p class="rail__kicker" id="r-class"></p>
+      <h2 class="rail__path" id="r-path"></h2>
+      <p class="rail__composite"><span class="num num--big" id="r-composite"></span><span class="rail__compositelabel">score</span></p>
+
+      <h3 class="rail__sub">What was measured</h3>
+      <ul class="profile" id="r-profile"></ul>
+
+      <div id="r-diverge" hidden>
+        <h3 class="rail__sub">Differs from similar files <span class="rail__handle num" id="r-drift"></span></h3>
+        <p class="rail__fleet" id="r-fleet"></p>
+        <ul class="deviants" id="r-deviants"></ul>
+      </div>
+
+      <h3 class="rail__sub">Recent commits
+        <span class="rail__handle num" id="r-handle"></span>
+      </h3>
+      <div class="evidence" id="r-evidence"><p class="muted">Loading…</p></div>
+    </div>
+  </aside>
+</main>
+
+<!-- One reused annotation callout for survey-mark hovers. A single node
+     kept out of the flow, positioned on demand — no per-mark DOM cost. -->
+<div class="tip" id="tip" role="tooltip" aria-hidden="true" hidden></div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

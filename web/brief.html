@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Codebase brief</title>
+<meta name="description" content="A plain-language brief on a codebase, derived entirely from its git history. Every figure is measured and reproducible.">
+<meta name="theme-color" content="#f7f3ea">
+<link rel="stylesheet" href="./fonts/fonts.css">
+<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./brief.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23f7f3ea'/><path d='M1 12 L5 5 L8 9 L11 3 L15 11' fill='none' stroke='%238a4a22' stroke-width='1.5'/></svg>">
+</head>
+<body class="brief-page">
+
+<nav class="brief-nav" id="brief-nav">
+  <form id="brief-form" class="brief-nav__form">
+    <label class="control__label" for="repo">Repository</label>
+    <input class="control__input" id="repo" list="repo-list" spellcheck="false" placeholder="/path/to/repo" autocomplete="off" required>
+    <datalist id="repo-list"></datalist>
+    <button class="btn btn--primary" type="submit" id="run-btn">Prepare brief</button>
+  </form>
+  <div class="brief-nav__links">
+    <a class="btn btn--ghost" id="to-survey" href="./index.html">Open the engineering survey</a>
+    <button class="btn btn--ghost" type="button" id="print-btn">Print</button>
+  </div>
+</nav>
+
+<main class="brief" id="brief" hidden>
+
+  <header class="brief__head">
+    <p class="brief__series">Codebase brief</p>
+    <h1 class="brief__title" id="b-repo">—</h1>
+    <p class="brief__period" id="b-period"></p>
+  </header>
+
+  <section class="brief__standfirst">
+    <p id="b-standfirst"></p>
+  </section>
+
+  <ol class="findings" id="findings"></ol>
+
+  <section class="brief__limits">
+    <h2>What this does and does not measure</h2>
+    <p>
+      Every figure above is computed from this repository's git history — commits, diffs,
+      authorship, and the current file tree. Nothing is estimated, sampled, or inferred by a
+      model. Running the same measurement on the same commit always produces the same numbers,
+      and the digest below is how you check that.
+    </p>
+    <p id="b-live" class="brief__live" hidden></p>
+    <p>
+      It measures <strong>how the code has moved</strong>, not whether the code is good. It cannot
+      see product quality, customer impact, architectural fitness, or anything that happened
+      outside version control. A file that scores calmly here can still be wrong; a file that
+      scores hot may be under deliberate, healthy redevelopment. Treat every finding as a place
+      to look, not a verdict.
+    </p>
+    <p id="b-gaps" class="brief__gaps"></p>
+  </section>
+
+  <footer class="brief__foot">
+    <dl>
+      <div><dt>Repository</dt><dd class="num" id="f-path"></dd></div>
+      <div><dt>Commit</dt><dd class="num" id="f-head"></dd></div>
+      <div><dt>Files measured</dt><dd class="num" id="f-files"></dd></div>
+      <div><dt>Contributors</dt><dd class="num" id="f-authors"></dd></div>
+      <div><dt>Digest</dt><dd class="num" id="f-digest"></dd></div>
+      <div><dt>Prepared</dt><dd class="num" id="f-when"></dd></div>
+    </dl>
+    <p class="brief__tool">
+      Measured with <span class="num">entropyx</span>, which reads the git history, and
+      <span class="num">WhatTheDiff</span>, which compares similar files against each other.
+      The digest is a fingerprint of the whole measurement: the same commit always produces the
+      same digest, which is how you check nothing has been massaged.
+    </p>
+  </footer>
+</main>
+
+<div class="brief-status" id="status">
+  <p id="status-text">Choose a repository to prepare a brief.</p>
+  <div class="brief-status__bar" id="status-bar" hidden><span id="status-fill"></span></div>
+  <p class="brief-status__hint" id="status-hint"></p>
+</div>
+
+<script type="module" src="./brief.js"></script>
+</body>
+</html>
