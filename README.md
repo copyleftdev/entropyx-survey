@@ -1,4 +1,7 @@
-# entropyx-ws
+# entropyx-survey
+
+[![tip](https://img.shields.io/badge/tip-tokentip.to%2F%40copyleftdev-8a4a22)](https://tokentip.to/@copyleftdev)
+[![licence](https://img.shields.io/badge/licence-AGPL--3.0-8a4a22)](LICENSE)
 
 A streaming bridge and browser survey for [entropyx](https://github.com/copyleftdev/entropyx),
 plus its scoring kernel compiled to WebAssembly.
