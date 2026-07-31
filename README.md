@@ -9,7 +9,7 @@ plus its scoring kernel compiled to WebAssembly.
 ![A walkthrough: typing a repository path and starting a survey, the phase log
 filling with real timings, the terrain drawing in, selecting a file to read its
 seven measurements and commits, dragging a weight slider while the map re-tints
-live, and hovering a survey mark to see what it records](docs/demo.gif)
+live, and hovering a survey mark to see what it records](web/demo.gif)
 
 *A real run against entropyx's own source, unedited apart from a faster opening.
 Watch for: the phase log showing where the time actually went; the map drawing in;

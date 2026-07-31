@@ -81,6 +81,20 @@
   <p id="status-text">Choose a repository to prepare a brief.</p>
   <div class="brief-status__bar" id="status-bar" hidden><span id="status-fill"></span></div>
   <p class="brief-status__hint" id="status-hint"></p>
+
+  <!-- Idle only. Hidden the moment a run starts, replaced by the brief
+       itself when one finishes, and dropped from print entirely. -->
+  <figure class="brief-demo" id="demo">
+    <img src="./demo.gif" width="820" height="718" loading="lazy" decoding="async"
+         alt="A walkthrough of the engineering survey: starting a scan, the phase log
+              filling with real timings, the terrain drawing in, reading one file's
+              measurements and commits, and re-weighting the map live">
+    <figcaption>
+      Every finding here is drilled from the engineering survey — the same
+      measurement, read by people who will open the files.
+      <a href="./index.html">Open the survey</a>
+    </figcaption>
+  </figure>
 </div>
 
 <script type="module" src="./brief.js"></script>

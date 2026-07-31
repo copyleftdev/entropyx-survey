@@ -48,6 +48,9 @@ function run() {
   $('run-btn').disabled = true;
   $('status').hidden = false;
   $('status-bar').hidden = false;
+  // The walkthrough is an idle-state affordance; once a real measurement
+  // is running it is just noise competing with the progress.
+  $('demo').hidden = true;
   setStatus('Measuring the repository…');
   $('status-hint').textContent =
     'A first measurement of a large repository can take several minutes. '

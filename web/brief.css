@@ -201,3 +201,27 @@
   .finding__source a { color: inherit; text-decoration: none; }
   .finding__source a::before { content: "→ "; }
 }
+
+/* ── Idle-state walkthrough ───────────────────────────────────────── */
+
+/* Shown only before a brief exists. It is a still-unfamiliar tool, and a
+   blank page with one input tells you nothing about what you are about
+   to get. */
+.brief-demo {
+  margin: var(--space-2xl) 0 0;
+  text-align: left;
+}
+.brief-demo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+}
+.brief-demo figcaption {
+  margin-top: var(--space-sm);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+.brief-demo figcaption a { color: var(--contour); text-underline-offset: 3px; }
