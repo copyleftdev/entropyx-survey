@@ -6,6 +6,15 @@
 A streaming bridge and browser survey for [entropyx](https://github.com/copyleftdev/entropyx),
 plus its scoring kernel compiled to WebAssembly.
 
+![The survey sheet: a squarified treemap of a repository where cell area is change
+density and shade is the blended risk score, with a legend, a per-file measurement
+profile and the commits behind it](docs/survey.png)
+
+*entropyx surveying its own source. Cell **area** is how much a file changes,
+**shade** is its overall score, and the symbols mark the six patterns entropyx
+recognises. The right rail reads one file: its seven measurements and the commits
+behind them.*
+
 ```
   entropyx crates ──┐                          ┌──► index.html  the survey sheet
    git·ast·core·tq  │                          │     terrain, calibration, evidence
@@ -253,6 +262,13 @@ Three judgement calls worth knowing about:
 Five findings — key-person concentration, unplanned work, interface movement, configuration
 divergence, and where the work happens — each with a headline number, the files behind it,
 and a note on what produced it.
+
+![The codebase brief: a printed-document layout with numbered findings, each with a
+headline number, supporting detail, the files behind it and a note on what produced
+it](docs/brief.png)
+
+*The same measurement, written for someone who will never open the terrain. It
+prints to a three-page PDF.*
 
 It also **never names an individual**. The survey does — engineers reading it already have
 git blame — but a name printed in a board pack as the single point of failure carries
